@@ -7,7 +7,7 @@ import { getHostedZoneCertificate } from "@/lib/acm";
 import { buildWebsiteBucketPolicy, buildRedirectBucketPolicy } from "@/lib/iam";
 import { buildWebsiteCloudfrontDistribution, buildCloudfrontOAI, buildRedirectCloudfrontDistribution } from "@/lib/cloudfront";
 import { buildWebsiteBucket, buildRedirectBucket, setS3BucketPolicy } from "@/lib/s3";
-import { IS_PRODUCTION } from "@/config";
+import { AWS_ADMINISTRATIVE_REGION, IS_PRODUCTION } from "@/config";
 
 export class WebsiteStack extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -15,9 +15,11 @@ export class WebsiteStack extends TerraformStack {
 
     buildS3Backend(this);
     buildAWSProvider(this);
+    
+    const administrativeRegionProvider = buildAWSProvider(this, AWS_ADMINISTRATIVE_REGION);
 
     const domainHostedZone = getHostedZone(this);
-    const certificate = getHostedZoneCertificate(this);
+    const certificate = getHostedZoneCertificate(this, undefined, administrativeRegionProvider);
     const oai = buildCloudfrontOAI(this);
 
     const websiteBucket = buildWebsiteBucket(this);
