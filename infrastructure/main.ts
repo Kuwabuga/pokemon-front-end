@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
 import { App, TerraformStack } from "cdktf";
-import { buildS3Backend } from "@/lib/backends"
+import { buildS3Backend } from "@/lib/backends";
 import { buildAWSProvider } from "@/lib/providers";
 import { createHostedZoneRecord, getHostedZone } from "@/lib/route53";
 import { getHostedZoneCertificate } from "@/lib/acm";
