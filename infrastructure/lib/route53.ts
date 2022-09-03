@@ -3,7 +3,11 @@ import { DataAwsRoute53Zone, DataAwsRoute53ZoneConfig, Route53Record, Route53Rec
 import { CloudfrontDistribution } from "@cdktf/provider-aws/lib/cloudfront";
 import { subdomain, domain } from "@/config";
 
-export const getHostedZone = (scope: Construct, id = "default-data-hosted-zone", domainName = domain): DataAwsRoute53Zone => {
+export const getHostedZone = (
+  scope: Construct, 
+  id = "default-data-hosted-zone", 
+  domainName = domain
+): DataAwsRoute53Zone => {
   return new DataAwsRoute53Zone(scope, id, <DataAwsRoute53ZoneConfig>{
     name: domainName
   });
