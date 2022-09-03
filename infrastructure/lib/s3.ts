@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
 import { DataAwsIamPolicyDocument } from "@cdktf/provider-aws/lib/iam";
-import { S3Bucket, S3BucketConfig, S3BucketPolicy, S3BucketPolicyConfig } from "@cdktf/provider-aws/lib/s3";
+import { DataAwsS3Bucket, DataAwsS3BucketConfig, S3Bucket, S3BucketConfig, S3BucketPolicy, S3BucketPolicyConfig } from "@cdktf/provider-aws/lib/s3";
 import { DEFAULTS, subdomain, domain } from "@/config";
 
 export const buildWebsiteBucket = (scope: Construct, subdomainName = subdomain, domainName = domain): S3Bucket => {
@@ -27,5 +27,15 @@ export const setS3BucketPolicy = (
   return new S3BucketPolicy(scope, id, <S3BucketPolicyConfig>{
     bucket: bucket.id,
     policy: policy.json
+  });
+};
+
+export const getS3Bucket = (
+  scope: Construct,
+  id = "default-data-bucket",
+  bucketName = `${subdomain}.${domain}`
+): DataAwsS3Bucket => {
+  return new DataAwsS3Bucket(scope, id, <DataAwsS3BucketConfig>{
+    bucket: bucketName
   });
 };
