@@ -4,7 +4,7 @@ import { buildS3Backend } from "@/lib/backends";
 import { buildAWSProvider } from "@/lib/providers";
 import { createHostedZoneRecord, getHostedZone } from "@/lib/route53";
 import { getHostedZoneCertificate } from "@/lib/acm";
-import { buildWebsiteBucketPolicy, buildRedirectBucketPolicy } from "@/lib/iam";
+import { buildBucketPolicy } from "@/lib/iam";
 import { buildWebsiteCloudfrontDistribution, buildCloudfrontOAI, buildRedirectCloudfrontDistribution } from "@/lib/cloudfront";
 import { buildWebsiteBucket, buildRedirectBucket, setS3BucketPolicy, setS3BucketBlockPublicAccess } from "@/lib/s3";
 import { AWS_ADMINISTRATIVE_REGION, IS_PRODUCTION, domain, subdomain } from "@/config";
@@ -24,7 +24,7 @@ export class WebsiteStack extends TerraformStack {
 
     const websiteBucket = buildWebsiteBucket(this);
     setS3BucketBlockPublicAccess(this, undefined, websiteBucket);
-    const websitePolicyDocument = buildWebsiteBucketPolicy(this, undefined, websiteBucket, oai);
+    const websitePolicyDocument = buildBucketPolicy(this, undefined, websiteBucket, oai);
     setS3BucketPolicy(this, undefined, websiteBucket, websitePolicyDocument);
 
     const websiteDistribution = buildWebsiteCloudfrontDistribution(this, undefined, undefined, certificate, websiteBucket, oai);
@@ -34,7 +34,7 @@ export class WebsiteStack extends TerraformStack {
       // Redirects example.com to www.example.com
       const redirectBucket = buildRedirectBucket(this);
       setS3BucketBlockPublicAccess(this, "redirect-bucket-public-access", websiteBucket);
-      const redirectBucketPolicyDocument = buildRedirectBucketPolicy(this, undefined, websiteBucket);
+      const redirectBucketPolicyDocument = buildBucketPolicy(this, "default-redirect-bucket-policy-document", websiteBucket, undefined);
       setS3BucketPolicy(this, "redirect-bucket-policy", redirectBucket, redirectBucketPolicyDocument);
 
       const redirectDistribution = buildRedirectCloudfrontDistribution(this, undefined, undefined, certificate, redirectBucket);
