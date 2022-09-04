@@ -7,7 +7,7 @@ import { getHostedZoneCertificate } from "@/lib/acm";
 import { buildWebsiteBucketPolicy, buildRedirectBucketPolicy } from "@/lib/iam";
 import { buildWebsiteCloudfrontDistribution, buildCloudfrontOAI, buildRedirectCloudfrontDistribution } from "@/lib/cloudfront";
 import { buildWebsiteBucket, buildRedirectBucket, setS3BucketPolicy, setS3BucketBlockPublicAccess } from "@/lib/s3";
-import { AWS_ADMINISTRATIVE_REGION, IS_PRODUCTION } from "@/config";
+import { AWS_ADMINISTRATIVE_REGION, IS_PRODUCTION, domain, subdomain } from "@/config";
 
 export class WebsiteStack extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -28,7 +28,7 @@ export class WebsiteStack extends TerraformStack {
     setS3BucketPolicy(this, undefined, websiteBucket, websitePolicyDocument);
 
     const websiteDistribution = buildWebsiteCloudfrontDistribution(this, undefined, undefined, certificate, websiteBucket, oai);
-    createHostedZoneRecord(this, undefined, undefined, domainHostedZone, websiteDistribution);
+    createHostedZoneRecord(this, undefined, `${subdomain}.${domain}`, domainHostedZone, websiteDistribution);
 
     if (IS_PRODUCTION) {
       // Redirects example.com to www.example.com
@@ -38,7 +38,7 @@ export class WebsiteStack extends TerraformStack {
       setS3BucketPolicy(this, "redirect-bucket-policy", redirectBucket, redirectBucketPolicyDocument);
 
       const redirectDistribution = buildRedirectCloudfrontDistribution(this, undefined, undefined, certificate, redirectBucket);
-      createHostedZoneRecord(this, "redirect-route53-record", undefined, domainHostedZone, redirectDistribution);
+      createHostedZoneRecord(this, "redirect-route53-record", domain, domainHostedZone, redirectDistribution);
     }
   }
 }
