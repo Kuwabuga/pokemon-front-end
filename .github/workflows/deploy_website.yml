@@ -111,4 +111,4 @@ jobs:
           AWS_TERRAFORM_BUCKET: ${{ secrets.AWS_TERRAFORM_BUCKET }}
           SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
           BUILD_PATH: application/dist
-        run: cdktf deploy sync-stack --auto-approve
+        run: cdktf deploy sync-s3-bucket-stack --auto-approve
