@@ -2,7 +2,7 @@
 import { Construct } from "constructs";
 import { DataAwsAcmCertificate } from "@cdktf/provider-aws/lib/acm";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3";
-import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionOrigin, CloudfrontDistributionOriginS3OriginConfig, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
+import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionOrigin, CloudfrontDistributionOriginCustomOriginConfig, CloudfrontDistributionOriginS3OriginConfig, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
 import { DEFAULTS } from "@/config";
 
 export const buildCloudfrontOAI = (scope: Construct, comment: string) => {
@@ -90,6 +90,12 @@ export const buildRedirectCloudfrontDistribution = (
         domainName: bucket.bucketRegionalDomainName,
         s3OriginConfig: <CloudfrontDistributionOriginS3OriginConfig>{
           originAccessIdentity: oai.cloudfrontAccessIdentityPath
+        },
+        customOriginConfig: <CloudfrontDistributionOriginCustomOriginConfig>{
+          httpPort: 80,
+          httpsPort: 443,
+          originProtocolPolicy: "http-only",
+          originSslProtocols: ["TLSv1", "TLSv1.1", "TLSv1.2"]
         }
       }
       ],
