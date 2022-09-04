@@ -6,7 +6,7 @@ export const buildBucketPolicy = (
   scope: Construct, 
   bucketName: string,
   bucket: S3Bucket | DataAwsS3Bucket,
-  sid = undefined,
+  sid: string | undefined,
   actions: string[],
   identifiers: string[]
 ): DataAwsIamPolicyDocument => {
