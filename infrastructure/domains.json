@@ -1,0 +1,10 @@
+{
+  "development": {
+    "subdomain": "development",
+    "domain": "kuwabuga.com"
+  },
+  "production": {
+    "subdomain": "www",
+    "domain": "kuwabuga.com"
+  }
+}
