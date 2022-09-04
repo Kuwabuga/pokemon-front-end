@@ -1,0 +1,114 @@
+name: Deploy Application
+
+on: workflow_dispatch
+
+env:
+  INFRASTRUCTURE_DIRECTORY: "./infrastructure"
+  APPLICATION_DIRECTORY: "./application"
+
+jobs:
+
+  unit-tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Install dependencies
+        working-directory: ${{ env.APPLICATION_DIRECTORY }}
+        run: npm install
+
+      - name: Run unit tests
+        working-directory: ${{ env.APPLICATION_DIRECTORY }}
+        run: npm run test:unit
+
+  e2e-tests:
+    name: Run e2e tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      # - name: Setup Node
+      #   uses: actions/setup-node@v2
+      #   with:
+      #     node-version: "16"
+
+  #     - name: Install dependencies
+  #       working-directory: ${{ env.APPLICATION_DIRECTORY }}
+  #       run: npm install
+
+  #     - name: Run Cypress
+  #       uses: cypress-io/github-action@v2
+  #       with:
+  #         project: ${{ env.APPLICATION_DIRECTORY }}
+  #         build: npm run build
+  #         start: npm start
+  #         wait-on: http://localhost:3030
+
+  deploy:
+    name: Deploy Website
+    needs: [unit-tests,e2e-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set environment
+        run: |
+          case ${GITHUB_REF##*/} in
+            "production") echo "ENVIRONMENT=production" >> $GITHUB_ENV ;;
+            "preprod") echo "ENVIRONMENT=preprod" >> $GITHUB_ENV ;;
+            "qa") echo "ENVIRONMENT=qa" >> $GITHUB_ENV ;;
+            *) echo "ENVIRONMENT=development" >> $GITHUB_ENV ;;
+          esac
+
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Install application's dependencies
+        working-directory: ${{ env.APPLICATION_DIRECTORY }}
+        run: npm install
+
+      - name: Run Audit
+        working-directory: ${{ env.APPLICATION_DIRECTORY }}
+        run: npm audit fix
+
+      - name: Run Lint
+        working-directory: ${{ env.APPLICATION_DIRECTORY }}
+        run: npm run lint
+
+      - name: Build
+        working-directory: ${{ env.APPLICATION_DIRECTORY }}
+        run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:  ${{ secrets.AWS_REGION }}
+      
+      - name: Install Terraform CDK
+        run: npm install --global cdktf-cli@0.12.2
+
+      - name: Install infrastructure's dependencies
+        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
+        run: npm install
+
+      - name: Deploy with Terraform CDK
+        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_TERRAFORM_BUCKET: ${{ secrets.AWS_TERRAFORM_BUCKET }}
+          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+          BUILD_PATH: application/dist
+        run: cdktf deploy sync-stack --auto-approve

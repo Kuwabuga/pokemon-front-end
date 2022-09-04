@@ -1,9 +1,12 @@
 name: Run Linting and Infrastructures' Unit Tests
 
 on:
+  pull_request:
+    paths: 
+      - "**"
   push:
-      branches:
-        - "**"
+    paths:
+      - "infrastructure/**"
 
 env:
   INFRASTRUCTURE_DIRECTORY: "./infrastructure"
