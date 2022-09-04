@@ -105,4 +105,4 @@ jobs:
         run: |
           SUBDOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.subdomain")
           DOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.domain")
-          aws s3 sync "../../$BUILD_PATH" "s3://$SUBDOMAIN.$DOMAIN"
+          aws s3 sync "../$BUILD_PATH" "s3://$SUBDOMAIN.$DOMAIN"
