@@ -1,7 +1,7 @@
 
 import { Construct } from "constructs";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3";
-import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
+import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionOrigin, CloudfrontDistributionOriginS3OriginConfig, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
 import { DEFAULTS, subdomain, domain } from "@/config";
 import { DataAwsAcmCertificate } from "@cdktf/provider-aws/lib/acm";
 
@@ -37,10 +37,10 @@ export const buildWebsiteCloudfrontDistribution = (
       }
     ],
     origin: [
-      {
+      <CloudfrontDistributionOrigin>{
         originId: bucket.id,
         domainName: bucket.bucketRegionalDomainName,
-        s3OriginConfig: {
+        s3OriginConfig: <CloudfrontDistributionOriginS3OriginConfig>{
           originAccessIdentity: oai.cloudfrontAccessIdentityPath
         }
       }
@@ -77,16 +77,20 @@ export const buildRedirectCloudfrontDistribution = (
   id = "default-redirect-cloudfront-distribution",
   domainName = domain,
   certificate: DataAwsAcmCertificate,
-  bucket: S3Bucket
+  bucket: S3Bucket,
+  oai: CloudfrontOriginAccessIdentity
 ): CloudfrontDistribution => {
   return new CloudfrontDistribution(scope, id, <CloudfrontDistributionConfig>{
     comment: DEFAULTS.comment,
     enabled: true,
     aliases: [domainName],
     origin: [
-      {
+      <CloudfrontDistributionOrigin>{
         originId: bucket.id,
         domainName: bucket.bucketRegionalDomainName,
+        s3OriginConfig: <CloudfrontDistributionOriginS3OriginConfig>{
+          originAccessIdentity: oai.cloudfrontAccessIdentityPath
+        }
       }
     ],
     defaultCacheBehavior: {
