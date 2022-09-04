@@ -10,7 +10,7 @@
       "plugin:@typescript-eslint/recommended"
     ],
     "rules": {
-        "no-console": "error",
+        "no-console": "off",
         "no-mixed-spaces-and-tabs": "off",
         "indent": ["error", 2],
         "quotes": ["error", "double", { "allowTemplateLiterals": true }],
