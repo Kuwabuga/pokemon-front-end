@@ -1,29 +1,26 @@
 import { Construct } from "constructs";
-import { DataAwsIamPolicyDocument, DataAwsIamPolicyDocumentConfig } from "@cdktf/provider-aws/lib/iam";
-import { S3Bucket } from "@cdktf/provider-aws/lib/s3";
-import { CloudfrontOriginAccessIdentity } from "@cdktf/provider-aws/lib/cloudfront";
+import { DataAwsIamPolicyDocument, DataAwsIamPolicyDocumentConfig, DataAwsIamPolicyDocumentStatementPrincipals } from "@cdktf/provider-aws/lib/iam";
+import { DataAwsS3Bucket, S3Bucket } from "@cdktf/provider-aws/lib/s3";
 
 export const buildBucketPolicy = (
   scope: Construct, 
   id = "default-website-bucket-policy-document",
-  bucket: S3Bucket,
-  oai: CloudfrontOriginAccessIdentity | undefined
+  bucket: S3Bucket | DataAwsS3Bucket,
+  actions: string[] = ["s3:GetObject"],
+  identifiers: string[]
 ): DataAwsIamPolicyDocument => {
-  const identifiers: string[] = [];
-  if(oai) {
-    identifiers.push(`${oai.iamArn}`);
-  } else {
-    identifiers.push("*");
-  }
-
   return new DataAwsIamPolicyDocument(scope, id, <DataAwsIamPolicyDocumentConfig>{
-    statement: [{
-      actions: ["s3:GetObject"],
-      resources: [`${bucket.arn}/*`],
-      principals: [{
-        type: "AWS",
-        identifiers: identifiers
-      }]
-    }]
+    statement: [
+      {
+        actions: actions,
+        resources: [bucket.arn,`${bucket.arn}/*`],
+        principals: [
+          <DataAwsIamPolicyDocumentStatementPrincipals>{
+            type: "AWS",
+            identifiers: identifiers
+          }
+        ]
+      }
+    ]
   });
 };
