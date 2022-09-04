@@ -2,7 +2,7 @@
 import { Construct } from "constructs";
 import { DataAwsAcmCertificate } from "@cdktf/provider-aws/lib/acm";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3";
-import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionOrigin, CloudfrontDistributionOriginCustomOriginConfig, CloudfrontDistributionOriginS3OriginConfig, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
+import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionCustomErrorResponse, CloudfrontDistributionOrigin, CloudfrontDistributionOriginCustomOriginConfig, CloudfrontDistributionOriginS3OriginConfig, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
 import { DEFAULTS } from "@/config";
 
 export const buildCloudfrontOAI = (scope: Construct, comment: string) => {
@@ -21,29 +21,31 @@ export const buildWebsiteCloudfrontDistribution = (
   return new CloudfrontDistribution(scope, `website-${domainName}-cloudfront-distribution`, 
     <CloudfrontDistributionConfig>{
       comment: DEFAULTS.comment,
+      tags: DEFAULTS.tags,
       enabled: true,
+      isIpv6Enabled: true,
       defaultRootObject: "index.html",
       aliases: [domainName],
       customErrorResponse: [
-        {
+        <CloudfrontDistributionCustomErrorResponse>{
           errorCode: 403,
           responseCode: 200,
           responsePagePath: "/"
         },
-        {
+        <CloudfrontDistributionCustomErrorResponse>{
           errorCode: 404,
           responseCode: 200,
           responsePagePath: "/"
         }
       ],
       origin: [
-      <CloudfrontDistributionOrigin>{
-        originId: bucket.id,
-        domainName: bucket.bucketRegionalDomainName,
-        s3OriginConfig: <CloudfrontDistributionOriginS3OriginConfig>{
-          originAccessIdentity: oai.cloudfrontAccessIdentityPath
+        <CloudfrontDistributionOrigin>{
+          originId: bucket.id,
+          domainName: bucket.bucketRegionalDomainName,
+          s3OriginConfig: <CloudfrontDistributionOriginS3OriginConfig>{
+            originAccessIdentity: oai.cloudfrontAccessIdentityPath
+          }
         }
-      }
       ],
       defaultCacheBehavior: {
         allowedMethods: ["GET", "HEAD"],
@@ -76,24 +78,24 @@ export const buildRedirectCloudfrontDistribution = (
   scope: Construct,
   domainName: string,
   certificate: DataAwsAcmCertificate,
-  bucket: S3Bucket
+  bucket: S3Bucket,
+  oai: CloudfrontOriginAccessIdentity
 ): CloudfrontDistribution => {
   return new CloudfrontDistribution(scope, `redirect-${domainName}-cloudfront-distribution`, 
     <CloudfrontDistributionConfig>{
       comment: DEFAULTS.comment,
+      tags: DEFAULTS.tags,
       enabled: true,
+      isIpv6Enabled: true,
       aliases: [domainName],
       origin: [
-      <CloudfrontDistributionOrigin>{
-        originId: bucket.id,
-        domainName: bucket.bucketRegionalDomainName,
-        customOriginConfig: <CloudfrontDistributionOriginCustomOriginConfig>{
-          httpPort: 80,
-          httpsPort: 443,
-          originProtocolPolicy: "http-only",
-          originSslProtocols: ["TLSv1", "TLSv1.1", "TLSv1.2"]
+        <CloudfrontDistributionOrigin>{
+          originId: bucket.id,
+          domainName: bucket.bucketRegionalDomainName,
+          s3OriginConfig: <CloudfrontDistributionOriginS3OriginConfig>{
+            originAccessIdentity: oai.cloudfrontAccessIdentityPath
+          }
         }
-      }
       ],
       defaultCacheBehavior: {
         allowedMethods: ["GET", "HEAD"],
