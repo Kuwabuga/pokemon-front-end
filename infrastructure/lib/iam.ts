@@ -3,36 +3,26 @@ import { DataAwsIamPolicyDocument, DataAwsIamPolicyDocumentConfig } from "@cdktf
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3";
 import { CloudfrontOriginAccessIdentity } from "@cdktf/provider-aws/lib/cloudfront";
 
-export const buildWebsiteBucketPolicy = (
+export const buildBucketPolicy = (
   scope: Construct, 
   id = "default-website-bucket-policy-document",
   bucket: S3Bucket,
-  oai: CloudfrontOriginAccessIdentity
+  oai: CloudfrontOriginAccessIdentity | undefined
 ): DataAwsIamPolicyDocument => {
-  return new DataAwsIamPolicyDocument(scope, id, <DataAwsIamPolicyDocumentConfig>{
-    statement: [{
-      actions: ["s3:GetObject"],
-      resources: [`${bucket.arn}/*`],
-      principals: [{
-        type: "AWS",
-        identifiers: [oai.iamArn]
-      }]
-    }]
-  });
-};
+  const identifiers: string[] = [];
+  if(oai) {
+    identifiers.push(`${oai.iamArn}`);
+  } else {
+    identifiers.push("*");
+  }
 
-export const buildRedirectBucketPolicy = (
-  scope: Construct, 
-  id = "default-redirect-bucket-policy-document",
-  bucket: S3Bucket
-): DataAwsIamPolicyDocument => {
   return new DataAwsIamPolicyDocument(scope, id, <DataAwsIamPolicyDocumentConfig>{
     statement: [{
       actions: ["s3:GetObject"],
       resources: [`${bucket.arn}/*`],
       principals: [{
         type: "AWS",
-        identifiers: ["*"]
+        identifiers: identifiers
       }]
     }]
   });
