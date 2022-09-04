@@ -4,12 +4,12 @@ import { DataAwsS3Bucket, S3Bucket } from "@cdktf/provider-aws/lib/s3";
 
 export const buildBucketPolicy = (
   scope: Construct, 
-  id = "default-website-bucket-policy-document",
+  bucketName: string,
   bucket: S3Bucket | DataAwsS3Bucket,
-  actions: string[] = ["s3:GetObject"],
+  actions: string[],
   identifiers: string[]
 ): DataAwsIamPolicyDocument => {
-  return new DataAwsIamPolicyDocument(scope, id, <DataAwsIamPolicyDocumentConfig>{
+  return new DataAwsIamPolicyDocument(scope, `${bucketName}-policy-document`, <DataAwsIamPolicyDocumentConfig>{
     statement: [
       <DataAwsIamPolicyDocumentStatement>{
         actions: actions,
