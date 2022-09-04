@@ -40,11 +40,11 @@ export const setS3BucketPolicy = (
 
 export const setS3BucketWebsiteConfig = (
   scope: Construct, 
-  id = "default-bucket-website-config", 
+  bucketName: string, 
   bucket: S3Bucket | DataAwsS3Bucket,
   record: Route53Record
 ): S3BucketWebsiteConfiguration => {
-  return new S3BucketWebsiteConfiguration(scope, id, <S3BucketWebsiteConfigurationConfig>{
+  return new S3BucketWebsiteConfiguration(scope, `${bucketName}-bucket-website-config`, <S3BucketWebsiteConfigurationConfig>{
     bucket: bucket.id,
     redirectAllRequestsTo: <S3BucketWebsiteConfigurationRedirectAllRequestsTo>{
       hostName: record.name,

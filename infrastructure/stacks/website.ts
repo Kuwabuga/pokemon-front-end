@@ -38,7 +38,7 @@ export class WebsiteStack extends TerraformStack {
       const redirectOAI = buildCloudfrontOAI(this, redirectBucketName);
       const redirectBucketPolicyDocument = buildBucketPolicy(this, redirectBucketName, redirectBucket, ["s3:GetObject"], [redirectOAI.iamArn]);
       setS3BucketPolicy(this, redirectBucketName, redirectBucket, redirectBucketPolicyDocument);
-      setS3BucketWebsiteConfig(this, undefined, redirectBucket, websiteRecord);
+      setS3BucketWebsiteConfig(this, redirectBucketName, redirectBucket, websiteRecord);
 
       const redirectDistribution = buildRedirectCloudfrontDistribution(this, redirectBucketName, certificate, redirectBucket, redirectOAI);
       createHostedZoneRecord(this, redirectBucketName, domainHostedZone, redirectDistribution);
