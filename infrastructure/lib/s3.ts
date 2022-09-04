@@ -1,6 +1,5 @@
 import { Construct } from "constructs";
 import { Route53Record } from "@cdktf/provider-aws/lib/route53";
-import { DataAwsIamPolicyDocument } from "@cdktf/provider-aws/lib/iam";
 import { DataAwsS3Bucket, S3Bucket, S3BucketConfig, S3BucketPolicy, S3BucketPolicyConfig, S3BucketPublicAccessBlock, S3BucketPublicAccessBlockConfig, S3BucketWebsiteConfiguration, S3BucketWebsiteConfigurationConfig, S3BucketWebsiteConfigurationRedirectAllRequestsTo } from "@cdktf/provider-aws/lib/s3";
 import { DEFAULTS } from "@/config";
 
