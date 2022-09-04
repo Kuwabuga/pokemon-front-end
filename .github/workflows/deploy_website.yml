@@ -96,19 +96,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:  ${{ secrets.AWS_REGION }}
-      
-      - name: Install Terraform CDK
-        run: npm install --global cdktf-cli@0.12.2
 
-      - name: Install infrastructure's dependencies
-        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
-        run: npm install
-
-      - name: Deploy with Terraform CDK
+      - name: Sync S3 webite bucket
         working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_TERRAFORM_BUCKET: ${{ secrets.AWS_TERRAFORM_BUCKET }}
-          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+          ENVIRONMENT: ${{ env.ENVIRONMENT }}
           BUILD_PATH: application/dist
-        run: cdktf deploy sync-s3-bucket-stack --auto-approve
+        run: |
+          SUBDOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.subdomain")
+          DOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.domain")
+          aws s3 sync "../../$BUILD_PATH" "s3://$SUBDOMAIN.$DOMAIN"

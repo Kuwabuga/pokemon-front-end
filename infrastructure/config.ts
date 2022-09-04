@@ -1,3 +1,5 @@
+import domains from "@/domains.json";
+
 export const AWS_ADMINISTRATIVE_REGION = "us-east-1";
 export const AWS_REGION = process.env.AWS_REGION || "eu-west-1";
 export const AWS_TERRAFORM_BUCKET = process.env.AWS_TERRAFORM_BUCKET;
@@ -18,16 +20,8 @@ export const BACKEND = {
   acl: "bucket-owner-full-control"
 };
 
-const config: { [index: string]: { subdomain: string, domain: string }; } = {
-  "development": {
-    subdomain: "development",
-    domain: "kuwabuga.com"
-  },
-  "production": {
-    subdomain: "www",
-    domain: "kuwabuga.com"
-  }
-};
-
-export const subdomain = config[ENVIRONMENT].subdomain;
-export const domain = config[ENVIRONMENT].domain;
+const parsedDomains: { [index: string]: { subdomain: string, domain: string } } = domains;
+export const subdomain = parsedDomains[ENVIRONMENT].subdomain;
+export const domain = parsedDomains[ENVIRONMENT].domain;
+export const websiteBucketName = `${subdomain}.${domain}`;
+export const redirectBucketName = domain;

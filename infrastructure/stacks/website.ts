@@ -6,7 +6,7 @@ import { createHostedZoneRecord, getHostedZone } from "@/lib/route53";
 import { getHostedZoneCertificate } from "@/lib/acm";
 import { buildWebsiteBucketPolicy, buildRedirectBucketPolicy } from "@/lib/iam";
 import { buildWebsiteCloudfrontDistribution, buildCloudfrontOAI, buildRedirectCloudfrontDistribution } from "@/lib/cloudfront";
-import { buildWebsiteBucket, buildRedirectBucket, setS3BucketPolicy } from "@/lib/s3";
+import { buildWebsiteBucket, buildRedirectBucket, setS3BucketPolicy, setS3BucketBlockPublicAccess } from "@/lib/s3";
 import { AWS_ADMINISTRATIVE_REGION, IS_PRODUCTION } from "@/config";
 
 export class WebsiteStack extends TerraformStack {
@@ -23,6 +23,7 @@ export class WebsiteStack extends TerraformStack {
     const oai = buildCloudfrontOAI(this);
 
     const websiteBucket = buildWebsiteBucket(this);
+    setS3BucketBlockPublicAccess(this, undefined, websiteBucket);
     const websitePolicyDocument = buildWebsiteBucketPolicy(this, undefined, websiteBucket, oai);
     setS3BucketPolicy(this, undefined, websiteBucket, websitePolicyDocument);
 
@@ -32,6 +33,7 @@ export class WebsiteStack extends TerraformStack {
     if (IS_PRODUCTION) {
       // Redirects example.com to www.example.com
       const redirectBucket = buildRedirectBucket(this);
+      setS3BucketBlockPublicAccess(this, "redirect-bucket-public-access", websiteBucket);
       const redirectBucketPolicyDocument = buildRedirectBucketPolicy(this, undefined, websiteBucket);
       setS3BucketPolicy(this, "redirect-bucket-policy", redirectBucket, redirectBucketPolicyDocument);
 
