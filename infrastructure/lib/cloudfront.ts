@@ -2,7 +2,7 @@
 import { Construct } from "constructs";
 import { DataAwsAcmCertificate } from "@cdktf/provider-aws/lib/acm";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3";
-import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionCustomErrorResponse, CloudfrontDistributionOrigin, CloudfrontDistributionOriginCustomOriginConfig, CloudfrontDistributionOriginS3OriginConfig, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
+import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionCustomErrorResponse, CloudfrontDistributionOrigin, CloudfrontDistributionOriginS3OriginConfig, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
 import { DEFAULTS } from "@/config";
 
 export const buildCloudfrontOAI = (scope: Construct, comment: string) => {
