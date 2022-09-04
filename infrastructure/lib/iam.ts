@@ -6,12 +6,14 @@ export const buildBucketPolicy = (
   scope: Construct, 
   bucketName: string,
   bucket: S3Bucket | DataAwsS3Bucket,
+  sid = undefined,
   actions: string[],
   identifiers: string[]
 ): DataAwsIamPolicyDocument => {
   return new DataAwsIamPolicyDocument(scope, `${bucketName}-policy-document`, <DataAwsIamPolicyDocumentConfig>{
     statement: [
       <DataAwsIamPolicyDocumentStatement>{
+        sid: sid,
         actions: actions,
         resources: [`${bucket.arn}/*`],
         principals: [
