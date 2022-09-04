@@ -97,7 +97,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:  ${{ secrets.AWS_REGION }}
 
-      - name: Sync S3 bucket
+      - name: Sync S3 webite bucket
         working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
         env:
           ENVIRONMENT: ${{ env.ENVIRONMENT }}
