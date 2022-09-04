@@ -2,6 +2,10 @@ import { Construct } from "constructs";
 import { DataAwsIamPolicyDocument, DataAwsIamPolicyDocumentConfig, DataAwsIamPolicyDocumentStatement, DataAwsIamPolicyDocumentStatementPrincipals } from "@cdktf/provider-aws/lib/iam";
 import { DataAwsS3Bucket, S3Bucket } from "@cdktf/provider-aws/lib/s3";
 
+/**
+ * TODO
+ * Get to know how to allow principal to be "*"
+ */
 export const buildBucketPolicy = (
   scope: Construct, 
   bucketName: string,
