@@ -8,6 +8,7 @@ export const buildBucketPolicy = (
   bucket: S3Bucket | DataAwsS3Bucket,
   sid: string | undefined,
   actions: string[],
+  type = "AWS",
   identifiers: string[]
 ): DataAwsIamPolicyDocument => {
   return new DataAwsIamPolicyDocument(scope, `${bucketName}-policy-document`, <DataAwsIamPolicyDocumentConfig>{
@@ -18,7 +19,7 @@ export const buildBucketPolicy = (
         resources: [`${bucket.arn}/*`],
         principals: [
           <DataAwsIamPolicyDocumentStatementPrincipals>{
-            type: "AWS",
+            type: type,
             identifiers: identifiers
           }
         ]
