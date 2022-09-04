@@ -1,5 +1,5 @@
 import { Construct } from "constructs";
-import { DataAwsIamPolicyDocument, DataAwsIamPolicyDocumentConfig, DataAwsIamPolicyDocumentStatementPrincipals } from "@cdktf/provider-aws/lib/iam";
+import { DataAwsIamPolicyDocument, DataAwsIamPolicyDocumentConfig, DataAwsIamPolicyDocumentStatement, DataAwsIamPolicyDocumentStatementPrincipals } from "@cdktf/provider-aws/lib/iam";
 import { DataAwsS3Bucket, S3Bucket } from "@cdktf/provider-aws/lib/s3";
 
 export const buildBucketPolicy = (
@@ -11,9 +11,9 @@ export const buildBucketPolicy = (
 ): DataAwsIamPolicyDocument => {
   return new DataAwsIamPolicyDocument(scope, id, <DataAwsIamPolicyDocumentConfig>{
     statement: [
-      {
+      <DataAwsIamPolicyDocumentStatement>{
         actions: actions,
-        resources: [bucket.arn,`${bucket.arn}/*`],
+        resources: [`${bucket.arn}/*`],
         principals: [
           <DataAwsIamPolicyDocumentStatementPrincipals>{
             type: "AWS",

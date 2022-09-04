@@ -20,25 +20,34 @@ export class WebsiteStack extends TerraformStack {
 
     const domainHostedZone = getHostedZone(this);
     const certificate = getHostedZoneCertificate(this, undefined, administrativeRegionProvider);
-    const oai = buildCloudfrontOAI(this);
-
+    
+    const websiteBucketName = `${subdomain}.${domain}`;
     const websiteBucket = buildWebsiteBucket(this);
-    setS3BucketBlockPublicAccess(this, undefined, websiteBucket);
-    const websitePolicyDocument = buildBucketPolicy(this, undefined, websiteBucket, undefined, [oai.iamArn]);
+    setS3BucketBlockPublicAccess(this, undefined, websiteBucket, true);
+    const websiteOAI = buildCloudfrontOAI(this, "website-cloudfront-oai", websiteBucketName);
+    const websitePolicyDocument = buildBucketPolicy(this, undefined, websiteBucket, undefined, [websiteOAI.iamArn]);
     setS3BucketPolicy(this, undefined, websiteBucket, websitePolicyDocument);
 
-    const websiteDistribution = buildWebsiteCloudfrontDistribution(this, undefined, undefined, certificate, websiteBucket, oai);
+    const websiteDistribution = buildWebsiteCloudfrontDistribution(this, undefined, undefined, certificate, websiteBucket, websiteOAI);
     const websiteRecord = createHostedZoneRecord(this, undefined, `${subdomain}.${domain}`, domainHostedZone, websiteDistribution);
 
     if (IS_PRODUCTION) {
       // Redirects example.com to www.example.com
+      const redirectBucketName = domain;
       const redirectBucket = buildRedirectBucket(this);
-      setS3BucketBlockPublicAccess(this, "redirect-bucket-public-access", redirectBucket);
-      const redirectBucketPolicyDocument = buildBucketPolicy(this, "default-redirect-bucket-policy-document", redirectBucket, undefined, ["*"]);
+      setS3BucketBlockPublicAccess(this, "redirect-bucket-public-access", redirectBucket, true);
+      const redirectOAI = buildCloudfrontOAI(this, "redirect-cloudfront-oai", redirectBucketName);
+      const redirectBucketPolicyDocument = buildBucketPolicy(
+        this, 
+        "default-redirect-bucket-policy-document", 
+        redirectBucket, 
+        undefined, 
+        [redirectOAI.iamArn]
+      );
       setS3BucketPolicy(this, "redirect-bucket-policy", redirectBucket, redirectBucketPolicyDocument);
       setS3BucketWebsiteConfig(this, undefined, redirectBucket, websiteRecord);
 
-      const redirectDistribution = buildRedirectCloudfrontDistribution(this, undefined, undefined, certificate, redirectBucket);
+      const redirectDistribution = buildRedirectCloudfrontDistribution(this, undefined, undefined, certificate, redirectBucket, redirectOAI);
       createHostedZoneRecord(this, "redirect-route53-record", domain, domainHostedZone, redirectDistribution);
     }
   }
