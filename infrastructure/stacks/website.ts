@@ -24,7 +24,7 @@ export class WebsiteStack extends TerraformStack {
 
     const websiteBucket = buildWebsiteBucket(this);
     setS3BucketBlockPublicAccess(this, undefined, websiteBucket);
-    const websitePolicyDocument = buildBucketPolicy(this, undefined, websiteBucket, oai);
+    const websitePolicyDocument = buildBucketPolicy(this, undefined, websiteBucket, undefined, [oai.iamArn]);
     setS3BucketPolicy(this, undefined, websiteBucket, websitePolicyDocument);
 
     const websiteDistribution = buildWebsiteCloudfrontDistribution(this, undefined, undefined, certificate, websiteBucket, oai);
@@ -33,8 +33,8 @@ export class WebsiteStack extends TerraformStack {
     if (IS_PRODUCTION) {
       // Redirects example.com to www.example.com
       const redirectBucket = buildRedirectBucket(this);
-      setS3BucketBlockPublicAccess(this, "redirect-bucket-public-access", websiteBucket, false);
-      const redirectBucketPolicyDocument = buildBucketPolicy(this, "default-redirect-bucket-policy-document", websiteBucket, undefined);
+      setS3BucketBlockPublicAccess(this, "redirect-bucket-public-access", redirectBucket);
+      const redirectBucketPolicyDocument = buildBucketPolicy(this, "default-redirect-bucket-policy-document", redirectBucket, undefined, ["*"]);
       setS3BucketPolicy(this, "redirect-bucket-policy", redirectBucket, redirectBucketPolicyDocument);
       setS3BucketWebsiteConfig(this, undefined, redirectBucket, websiteRecord);
 
