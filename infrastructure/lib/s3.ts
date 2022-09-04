@@ -30,11 +30,25 @@ export const setS3BucketPolicy = (
   scope: Construct, 
   bucketName: string, 
   bucket: S3Bucket, 
-  policy: DataAwsIamPolicyDocument
+  sid: string | undefined,
+  principal: string | { [index: string]: string },
+  action: string[]
 ): S3BucketPolicy => {
   return new S3BucketPolicy(scope, `${bucketName}-set-bucket-policy`, <S3BucketPolicyConfig>{
     bucket: bucket.id,
-    policy: policy.json
+    policy: JSON.stringify({
+      Version: "2012-10-17",
+      Id: `${bucketName}-bucket-policy`,
+      Statement: [
+        {
+          Sid: sid,
+          Effect: "Allow",
+          Principal: principal,
+          Action: action,
+          Resource: [`${bucket.arn}/*`, `${bucket.arn}`],
+        },
+      ],
+    }),
   });
 };
 
