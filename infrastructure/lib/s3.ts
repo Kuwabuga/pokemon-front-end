@@ -1,12 +1,13 @@
 import { Construct } from "constructs";
 import { DataAwsIamPolicyDocument } from "@cdktf/provider-aws/lib/iam";
-import { DataAwsS3Bucket, DataAwsS3BucketConfig, S3Bucket, S3BucketConfig, S3BucketPolicy, S3BucketPolicyConfig } from "@cdktf/provider-aws/lib/s3";
+import { DataAwsS3Bucket, DataAwsS3BucketConfig, S3Bucket, S3BucketConfig, S3BucketPolicy, S3BucketPolicyConfig, S3BucketPublicAccessBlock, S3BucketPublicAccessBlockConfig } from "@cdktf/provider-aws/lib/s3";
 import { DEFAULTS, subdomain, domain } from "@/config";
 
 export const buildWebsiteBucket = (scope: Construct, subdomainName = subdomain, domainName = domain): S3Bucket => {
   const bucketName = `${subdomainName}.${domainName}`;
   return new S3Bucket(scope, `${bucketName}-bucket`, <S3BucketConfig>{
     bucket: bucketName,
+    acl: "private",
     tags: DEFAULTS.tags
   });
 };
@@ -17,6 +18,21 @@ export const buildRedirectBucket = (scope: Construct, domainName = domain): S3Bu
     tags: DEFAULTS.tags
   });
 };
+
+export const setS3BucketBlockPublicAccess = (
+  scope: Construct,
+  id = "default-bucket-public-access",
+  bucket: S3Bucket | DataAwsS3Bucket,
+  blockPublicAccess = true
+) => {
+  return new S3BucketPublicAccessBlock(scope, id, <S3BucketPublicAccessBlockConfig>{
+    bucket: bucket.id,
+    blockPublicAcls: blockPublicAccess,
+    blockPublicPolicy: blockPublicAccess,
+    ignorePublicAcls: blockPublicAccess,
+    restrictPublicBuckets: blockPublicAccess
+  });
+}
 
 export const setS3BucketPolicy = (
   scope: Construct, 
