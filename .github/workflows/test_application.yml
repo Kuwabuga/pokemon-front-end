@@ -29,9 +29,10 @@ jobs:
         working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
 
-      - name: Run unit tests
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
-        run: npm run test:unit
+      # TODO
+      # - name: Run unit tests
+      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
+      #   run: npm run test:unit
 
   e2e-tests:
     name: Run e2e tests
@@ -49,6 +50,7 @@ jobs:
         working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
 
-      - name: Run e2e tests
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
-        run: npm run test:e2e
+      # TODO
+      # - name: Run e2e tests
+      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
+      #   run: npm run test:e2e
