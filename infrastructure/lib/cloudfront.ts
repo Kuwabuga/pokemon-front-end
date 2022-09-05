@@ -60,7 +60,7 @@ export const buildWebsiteCloudfrontDistribution = (
         },
         viewerProtocolPolicy: "redirect-to-https",
         minTtl: 0,
-        defaultTtl: 3153600000
+        defaultTtl: 2592000
       },
       restrictions: <CloudfrontDistributionRestrictions>{
         geoRestriction: <CloudfrontDistributionRestrictionsGeoRestriction>{
@@ -113,7 +113,7 @@ export const buildRedirectCloudfrontDistribution = (
         },
         viewerProtocolPolicy: "allow-all",
         minTtl: 0,
-        defaultTtl: 3153600000
+        defaultTtl: 2592000
       },
       restrictions: <CloudfrontDistributionRestrictions>{
         geoRestriction: <CloudfrontDistributionRestrictionsGeoRestriction>{
