@@ -1,3 +1,3 @@
 # Website
 
-Current default AWS provider region: us-east-1
+Current default AWS provider region: eu-west-1
