@@ -109,8 +109,9 @@ jobs:
           
           # Invalidate Cloudfront cache
           DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$SUBDOMAIN.$DOMAIN']] | [0].Id")
-          aws cloudfront create-invalidation --distribution-id=$DISTRIBUTION --paths /*
+          echo $DISTRIBUTION
+          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths /*
           if [ "$ENVIRONMENT" == "production" ] || [ "$ENVIRONMENT" == "prod" ]; then
             REDIRECT_DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$DOMAIN']] | [0].Id")
-            aws cloudfront create-invalidation --distribution-id=$REDIRECT_DISTRIBUTION --paths /*
+            aws cloudfront create-invalidation --distribution-id $REDIRECT_DISTRIBUTION --paths /*
           fi
