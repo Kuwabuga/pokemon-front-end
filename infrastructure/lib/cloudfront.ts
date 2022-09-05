@@ -2,7 +2,7 @@
 import { Construct } from "constructs";
 import { DataAwsAcmCertificate } from "@cdktf/provider-aws/lib/acm";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3";
-import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionCustomErrorResponse, CloudfrontDistributionOrigin, CloudfrontDistributionOriginS3OriginConfig, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
+import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionCustomErrorResponse, CloudfrontDistributionDefaultCacheBehavior, CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies, CloudfrontDistributionOrigin, CloudfrontDistributionOriginS3OriginConfig, CloudfrontDistributionRestrictions, CloudfrontDistributionRestrictionsGeoRestriction, CloudfrontDistributionViewerCertificate, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
 import { DEFAULTS } from "@/config";
 
 export const buildCloudfrontOAI = (scope: Construct, comment: string) => {
@@ -47,13 +47,13 @@ export const buildWebsiteCloudfrontDistribution = (
           }
         }
       ],
-      defaultCacheBehavior: {
+      defaultCacheBehavior: <CloudfrontDistributionDefaultCacheBehavior>{
         allowedMethods: ["GET", "HEAD"],
         cachedMethods: ["GET", "HEAD"],
         targetOriginId: bucket.id,
         forwardedValues: {
           queryString: false,
-          cookies: {
+          cookies: <CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies>{
             forward: "none"
           }
         },
@@ -62,12 +62,12 @@ export const buildWebsiteCloudfrontDistribution = (
         defaultTtl: 0,
         maxTtl: 0
       },
-      restrictions: {
-        geoRestriction: {
+      restrictions: <CloudfrontDistributionRestrictions>{
+        geoRestriction: <CloudfrontDistributionRestrictionsGeoRestriction>{
           restrictionType: "none"
         }
       },
-      viewerCertificate: {
+      viewerCertificate: <CloudfrontDistributionViewerCertificate>{
         acmCertificateArn: certificate.arn,
         sslSupportMethod: "sni-only"
       }
@@ -90,34 +90,34 @@ export const buildRedirectCloudfrontDistribution = (
       aliases: [domainName],
       origin: [
         <CloudfrontDistributionOrigin>{
-          originId: bucket.id,
+          originId: bucket.websiteEndpoint,
           domainName: bucket.bucketRegionalDomainName,
           s3OriginConfig: <CloudfrontDistributionOriginS3OriginConfig>{
             originAccessIdentity: oai.cloudfrontAccessIdentityPath
           }
         }
       ],
-      defaultCacheBehavior: {
+      defaultCacheBehavior: <CloudfrontDistributionDefaultCacheBehavior>{
         allowedMethods: ["GET", "HEAD"],
         cachedMethods: ["GET", "HEAD"],
         targetOriginId: bucket.id,
         forwardedValues: {
-          queryString: false,
-          cookies: {
-            forward: "none"
+          queryString: true,
+          cookies: <CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies>{
+            forward: "all"
           }
         },
-        viewerProtocolPolicy: "redirect-to-https",
+        viewerProtocolPolicy: "allow-all",
         minTtl: 0,
         defaultTtl: 0,
         maxTtl: 0
       },
-      restrictions: {
-        geoRestriction: {
+      restrictions: <CloudfrontDistributionRestrictions>{
+        geoRestriction: <CloudfrontDistributionRestrictionsGeoRestriction>{
           restrictionType: "none"
         }
       },
-      viewerCertificate: {
+      viewerCertificate: <CloudfrontDistributionViewerCertificate>{
         acmCertificateArn: certificate.arn,
         sslSupportMethod: "sni-only"
       }
