@@ -22,6 +22,7 @@ export const buildWebsiteCloudfrontDistribution = (
     <CloudfrontDistributionConfig>{
       comment: DEFAULTS.comment,
       tags: DEFAULTS.tags,
+      priceClass: "PriceClass_100",
       enabled: true,
       isIpv6Enabled: true,
       defaultRootObject: "index.html",
@@ -59,8 +60,7 @@ export const buildWebsiteCloudfrontDistribution = (
         },
         viewerProtocolPolicy: "redirect-to-https",
         minTtl: 0,
-        defaultTtl: 0,
-        maxTtl: 0
+        defaultTtl: 3153600000
       },
       restrictions: <CloudfrontDistributionRestrictions>{
         geoRestriction: <CloudfrontDistributionRestrictionsGeoRestriction>{
@@ -85,6 +85,7 @@ export const buildRedirectCloudfrontDistribution = (
     <CloudfrontDistributionConfig>{
       comment: DEFAULTS.comment,
       tags: DEFAULTS.tags,
+      priceClass: "PriceClass_100",
       enabled: true,
       isIpv6Enabled: true,
       aliases: [domainName],
@@ -112,8 +113,7 @@ export const buildRedirectCloudfrontDistribution = (
         },
         viewerProtocolPolicy: "allow-all",
         minTtl: 0,
-        defaultTtl: 0,
-        maxTtl: 0
+        defaultTtl: 3153600000
       },
       restrictions: <CloudfrontDistributionRestrictions>{
         geoRestriction: <CloudfrontDistributionRestrictionsGeoRestriction>{
