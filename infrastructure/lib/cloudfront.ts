@@ -2,7 +2,7 @@
 import { Construct } from "constructs";
 import { DataAwsAcmCertificate } from "@cdktf/provider-aws/lib/acm";
 import { S3Bucket, S3BucketWebsiteConfiguration } from "@cdktf/provider-aws/lib/s3";
-import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionCustomErrorResponse, CloudfrontDistributionDefaultCacheBehavior, CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies, CloudfrontDistributionOrigin, CloudfrontDistributionOriginCustomOriginConfig, CloudfrontDistributionOriginS3OriginConfig, CloudfrontDistributionRestrictions, CloudfrontDistributionRestrictionsGeoRestriction, CloudfrontDistributionViewerCertificate, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
+import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionCustomErrorResponse, CloudfrontDistributionDefaultCacheBehavior, CloudfrontDistributionDefaultCacheBehaviorForwardedValues, CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies, CloudfrontDistributionOrigin, CloudfrontDistributionOriginCustomOriginConfig, CloudfrontDistributionOriginS3OriginConfig, CloudfrontDistributionRestrictions, CloudfrontDistributionRestrictionsGeoRestriction, CloudfrontDistributionViewerCertificate, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
 import { DEFAULTS } from "@/config";
 
 export const buildCloudfrontOAI = (scope: Construct, comment: string) => {
@@ -52,14 +52,15 @@ export const buildWebsiteCloudfrontDistribution = (
         allowedMethods: ["GET", "HEAD"],
         cachedMethods: ["GET", "HEAD"],
         targetOriginId: bucket.id,
-        forwardedValues: {
-          queryString: false,
+        forwardedValues: <CloudfrontDistributionDefaultCacheBehaviorForwardedValues>{
+          queryString: true,
           cookies: <CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies>{
-            forward: "none"
+            forward: "all"
           }
         },
         viewerProtocolPolicy: "redirect-to-https",
         minTtl: 0,
+        maxTtl: 31536000,
         defaultTtl: 2592000
       },
       restrictions: <CloudfrontDistributionRestrictions>{
@@ -105,7 +106,7 @@ export const buildRedirectCloudfrontDistribution = (
         allowedMethods: ["GET", "HEAD"],
         cachedMethods: ["GET", "HEAD"],
         targetOriginId: bucket.id,
-        forwardedValues: {
+        forwardedValues: <CloudfrontDistributionDefaultCacheBehaviorForwardedValues>{
           queryString: true,
           cookies: <CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies>{
             forward: "all"
@@ -113,6 +114,7 @@ export const buildRedirectCloudfrontDistribution = (
         },
         viewerProtocolPolicy: "allow-all",
         minTtl: 0,
+        maxTtl: 31536000,
         defaultTtl: 2592000
       },
       restrictions: <CloudfrontDistributionRestrictions>{
