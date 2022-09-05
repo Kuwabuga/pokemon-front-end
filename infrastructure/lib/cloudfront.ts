@@ -1,7 +1,7 @@
 
 import { Construct } from "constructs";
 import { DataAwsAcmCertificate } from "@cdktf/provider-aws/lib/acm";
-import { S3Bucket } from "@cdktf/provider-aws/lib/s3";
+import { S3Bucket, S3BucketWebsiteConfiguration } from "@cdktf/provider-aws/lib/s3";
 import { CloudfrontDistribution, CloudfrontDistributionConfig, CloudfrontDistributionCustomErrorResponse, CloudfrontDistributionDefaultCacheBehavior, CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies, CloudfrontDistributionOrigin, CloudfrontDistributionOriginCustomOriginConfig, CloudfrontDistributionOriginS3OriginConfig, CloudfrontDistributionRestrictions, CloudfrontDistributionRestrictionsGeoRestriction, CloudfrontDistributionViewerCertificate, CloudfrontOriginAccessIdentity, CloudfrontOriginAccessIdentityConfig } from "@cdktf/provider-aws/lib/cloudfront";
 import { DEFAULTS } from "@/config";
 
@@ -78,7 +78,8 @@ export const buildRedirectCloudfrontDistribution = (
   scope: Construct,
   domainName: string,
   certificate: DataAwsAcmCertificate,
-  bucket: S3Bucket
+  bucket: S3Bucket,
+  bucketWebsiteConfig: S3BucketWebsiteConfiguration
 ): CloudfrontDistribution => {
   return new CloudfrontDistribution(scope, `redirect-${domainName}-cloudfront-distribution`, 
     <CloudfrontDistributionConfig>{
@@ -90,7 +91,7 @@ export const buildRedirectCloudfrontDistribution = (
       origin: [
         <CloudfrontDistributionOrigin>{
           originId: bucket.id,
-          domainName: bucket.websiteEndpoint,
+          domainName: bucketWebsiteConfig.websiteEndpoint,
           customOriginConfig: <CloudfrontDistributionOriginCustomOriginConfig>{
             httpPort: 80,
             httpsPort: 443,
