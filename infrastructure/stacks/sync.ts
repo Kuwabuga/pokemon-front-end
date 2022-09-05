@@ -20,4 +20,19 @@ export class SyncS3BucketStack extends TerraformStack {
     console.log(stdout);
     console.log(stderr);
   }
+
+  // Get all the files from build folder, skip directories
+  // const files = glob.sync('../web/build/**/*', { absolute: false, nodir: true });
+
+  // // Create bucket object for each file
+  // for (const file of files) {
+  //   new S3BucketObject(this, `aws_s3_bucket_object_${path.basename(file)}`, {
+  //     dependsOn: [bucket],
+  //     key: file.replace(`../web/build/`, ''),       // Using relative path for folder structure on S3
+  //     bucket: BUCKET_NAME,
+  //     source: path.resolve(file),          // Using absolute path to upload
+  //     etag: `${Date.now()}`,
+  //     contentType: mime.contentType(path.extname(file)) || undefined       // Set the content-type for each object
+  //   });
+  // }
 }
