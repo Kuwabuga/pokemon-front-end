@@ -100,7 +100,7 @@ export const buildRedirectCloudfrontDistribution = (
       defaultCacheBehavior: <CloudfrontDistributionDefaultCacheBehavior>{
         allowedMethods: ["GET", "HEAD"],
         cachedMethods: ["GET", "HEAD"],
-        targetOriginId: bucket.id,
+        targetOriginId: bucket.websiteEndpoint,
         forwardedValues: {
           queryString: true,
           cookies: <CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies>{
