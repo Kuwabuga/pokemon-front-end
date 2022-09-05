@@ -105,7 +105,7 @@ jobs:
           # Update bucket content
           SUBDOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.subdomain")
           DOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.domain")
-          aws s3 sync "../$BUILD_PATH" "s3://$SUBDOMAIN.$DOMAIN" --delete
+          aws s3 sync "../$BUILD_PATH" "s3://$SUBDOMAIN.$DOMAIN" --cache-control no-cache --delete
           
           # Invalidate Cloudfront cache
           DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$SUBDOMAIN.$DOMAIN']] | [0].Id" | sed 's/"//g')
