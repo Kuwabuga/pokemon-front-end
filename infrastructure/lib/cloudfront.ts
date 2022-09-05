@@ -78,8 +78,7 @@ export const buildRedirectCloudfrontDistribution = (
   scope: Construct,
   domainName: string,
   certificate: DataAwsAcmCertificate,
-  bucket: S3Bucket,
-  oai: CloudfrontOriginAccessIdentity
+  bucket: S3Bucket
 ): CloudfrontDistribution => {
   return new CloudfrontDistribution(scope, `redirect-${domainName}-cloudfront-distribution`, 
     <CloudfrontDistributionConfig>{
@@ -91,10 +90,7 @@ export const buildRedirectCloudfrontDistribution = (
       origin: [
         <CloudfrontDistributionOrigin>{
           originId: bucket.websiteEndpoint,
-          domainName: bucket.bucketRegionalDomainName,
-          s3OriginConfig: <CloudfrontDistributionOriginS3OriginConfig>{
-            originAccessIdentity: oai.cloudfrontAccessIdentityPath
-          }
+          domainName: bucket.websiteEndpoint
         }
       ],
       defaultCacheBehavior: <CloudfrontDistributionDefaultCacheBehavior>{
