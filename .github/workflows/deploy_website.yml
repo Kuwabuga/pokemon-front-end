@@ -76,13 +76,14 @@ jobs:
         working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
 
-      - name: Run Audit
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
-        run: npm audit fix
+      # TODO
+      # - name: Run Audit
+      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
+      #   run: npm audit fix
 
-      - name: Run Lint
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
-        run: npm run lint
+      # - name: Run Lint
+      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
+      #   run: npm run lint
 
       - name: Build
         working-directory: ${{ env.APPLICATION_DIRECTORY }}
