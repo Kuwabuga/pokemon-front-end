@@ -108,7 +108,7 @@ jobs:
           aws s3 sync "../$BUILD_PATH" "s3://$SUBDOMAIN.$DOMAIN" --delete
           
           # Invalidate Cloudfront cache
-          DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$SUBDOMAIN.$DOMAIN']] | [0].Id")
+          DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$SUBDOMAIN.$DOMAIN']] | [0].Id" | sed 's/"//g')
           echo $DOMAIN
           echo $SUBDOMAIN
           echo $DISTRIBUTION
