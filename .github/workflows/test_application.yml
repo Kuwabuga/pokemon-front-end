@@ -49,9 +49,6 @@ jobs:
         working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
 
-      - name: Run Cypress
-        uses: cypress-io/github-action@v2
-        with:
-          project: ${{ env.APPLICATION_DIRECTORY }}
-          build: npm run build
-          start: npm run start
+      - name: Run e2e tests
+        working-directory: ${{ env.APPLICATION_DIRECTORY }}
+        run: npm run test:e2e
