@@ -89,14 +89,14 @@ export const buildRedirectCloudfrontDistribution = (
       aliases: [domainName],
       origin: [
         <CloudfrontDistributionOrigin>{
-          originId: bucket.websiteEndpoint,
+          originId: bucket.id,
           domainName: bucket.websiteEndpoint
         }
       ],
       defaultCacheBehavior: <CloudfrontDistributionDefaultCacheBehavior>{
         allowedMethods: ["GET", "HEAD"],
         cachedMethods: ["GET", "HEAD"],
-        targetOriginId: bucket.websiteEndpoint,
+        targetOriginId: bucket.id,
         forwardedValues: {
           queryString: true,
           cookies: <CloudfrontDistributionDefaultCacheBehaviorForwardedValuesCookies>{
