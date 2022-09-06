@@ -1,5 +1,4 @@
 {
-  "root": true,
   "env": {
     "browser": true,
     "es2021": true,
@@ -7,9 +6,8 @@
   },
   "extends": [
     "eslint:recommended",
-    "@vue/typescript/recommend",
-    "plugin:vue/vue3-recommended",
-    "prettier"
+    "plugin:vue/vue3-essential",
+    "plugin:@typescript-eslint/recommended"
   ],
   "parser": "vue-eslint-parser",
   "parserOptions": {
@@ -17,8 +15,9 @@
     "sourceType": "module",
     "parser": "@typescript-eslint/parser"
   },
-  "plugins": ["vue"],
+  "plugins": ["vue", "@typescript-eslint"],
   "rules": {
+    "no-mixed-spaces-and-tabs": "off",
     "indent": ["error", "tab"],
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "double"],

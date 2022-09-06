@@ -1,19 +1,26 @@
-import { RouteRecordRaw, createRouter, createWebHistory } from "vue-router";
+import { RouteRecordRaw, createRouter, createWebHistory, RouterOptions } from "vue-router";
+
+export const routesNames = {
+	HelloWorld: "hello-world",
+	NotFound: "not-found"
+};
 
 const routes: Array<RouteRecordRaw> = [
   <RouteRecordRaw>{
-    path: "/hello-world",
-    name: "hello-world",
-    component: () => import("@/views/HelloWorld.vue")
+  	path: "/",
+  	name: routesNames.HelloWorld,
+  	component: () => import("@/views/HelloWorld.vue")
   },
   <RouteRecordRaw>{
-    path: "/:catchAll(.*)*"
+  	path: "/:catchAll(.*)*",
+  	name: routesNames.NotFound,
+  	component: () => import("@/views/NotFound.vue")
   }
-]
+];
 
-const Router = createRouter({
-  history: createWebHistory(""),
-  routes: routes
+const router = createRouter(<RouterOptions>{
+	history: createWebHistory(""),
+	routes: routes
 });
 
-export default Router;
+export default router;

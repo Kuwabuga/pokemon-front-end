@@ -1,19 +1,21 @@
 import { resolve } from "path";
+import { ServerOptions } from "https";
 import vue from "@vitejs/plugin-vue";
-import { defineConfig, UserConfigExport } from "vite";
+import { AliasOptions, BuildOptions, defineConfig, ResolveOptions, UserConfigExport } from "vite";
 
-// https://vitejs.dev/config/
-export default defineConfig(<UserConfigExport>{
-	plugins: [vue()],
-	resolve: {
-		alias: {
-			"@": resolve(__dirname, "./src")
-		}
-	},
-	server: {
-		port: 8040
-	},
-	build: {
-		chunkSizeWarningLimit: 600
-	}
-});
+export default defineConfig(
+  <UserConfigExport>{
+  	plugins: [vue()],
+  	resolve: <ResolveOptions>{
+  		alias: <AliasOptions>{
+  			"@": resolve(__dirname, "./src")
+  		}
+  	},
+  	server: <ServerOptions>{
+  		port: 8040
+  	},
+  	build: <BuildOptions>{
+  		chunkSizeWarningLimit: 600
+  	}
+  }
+);
