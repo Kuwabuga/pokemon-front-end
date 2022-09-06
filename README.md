@@ -2,6 +2,10 @@
 
 Current default provider AWS region: eu-west-1
 
+## Description
+Main website for the Kuwabuga organization!<br>
+www.kuwabuga.com
+
 ## To do
 - Setup lambda@edge (not needed for now)
 - Find a way to sync buckets contents with Terraform CDK (not needed at all)
@@ -16,24 +20,20 @@ Current default provider AWS region: eu-west-1
 [![Deploy Infrastructure](https://github.com/Kuwabuga/website/actions/workflows/deploy_infrastructure.yml/badge.svg?branch=production)](https://github.com/Kuwabuga/website/actions/workflows/deploy_infrastructure.yml)<br>
 [![Deploy Application](https://github.com/Kuwabuga/website/actions/workflows/deploy_website.yml/badge.svg?branch=production)](https://github.com/Kuwabuga/website/actions/workflows/deploy_website.yml)
 
-## Description
-Main website for the Kuwabuga organization!<br>
-www.kuwabuga.com
-
-## Details
+## Notes
 
 ### Workflows
 #### Run Linting and Infrastructures' Unit Tests
 - Self explanatory
 - Runs on every commit that contains a change on any file under the folder `infrastructure`
-### Run Website's Unit and E2E tests
+#### Run Website's Unit and E2E tests
 - Self explanatory
 - Runs on every commit that contains a change on any file under the folder `application`
-### Deploy Infrastructure
+#### Deploy Infrastructure
 - Can only be triggered manually
 - Deploys the application to a specific environment depending on the selected branch (if `production` branch deploys to `production` environment, `development` branch to `development` environment, etc..)
 - Terraform CDK will check what changes were made and apply them automatically
-### Deploy Application
+#### Deploy Application
 - Can only be triggered manually
 - Deploys the application to a specific environment depending on the selected branch (if `production` branch deploys to `production` environment, `development` branch to `development` environment, etc..)
 - It will `sync` with the website S3 bucket the dist folder (outcome of running the `npm run build` command)
@@ -49,11 +49,11 @@ www.kuwabuga.com
 - Built using Vite + Vue 3 (TypeScript)
 - Under development
 
-## Authors
+# Authors
 #### Infrastructure and workflows: [José Cunha](https://github.com/Migas99)
 #### Application: [José Cunha](https://github.com/Migas99), [Carina Santos](https://github.com/Cariinacsantos) and [Fábio Mendes](https://github.com/AtumFaboca)
 
-## License
+# License
 MIT License
 
 Copyright (c) 2022 Kuwabuga
