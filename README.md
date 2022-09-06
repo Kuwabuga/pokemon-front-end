@@ -20,6 +20,13 @@ www.kuwabuga.com
 [![Deploy Infrastructure](https://github.com/Kuwabuga/website/actions/workflows/deploy_infrastructure.yml/badge.svg?branch=production)](https://github.com/Kuwabuga/website/actions/workflows/deploy_infrastructure.yml)<br>
 [![Deploy Application](https://github.com/Kuwabuga/website/actions/workflows/deploy_website.yml/badge.svg?branch=production)](https://github.com/Kuwabuga/website/actions/workflows/deploy_website.yml)
 
+## Recommended VS Code extensions
+- [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+- [ENV](https://marketplace.visualstudio.com/items?itemName=IronGeek.vscode-env)
+- [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (for `application`)
+
 ## Notes
 
 ### Workflows
