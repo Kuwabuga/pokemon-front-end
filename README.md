@@ -2,6 +2,12 @@
 
 Current default provider AWS region: eu-west-1
 
+## To do
+- Setup lambda@edge (not needed for now)
+- Find a way to sync buckets contents with Terraform CDK (not needed at all)
+- Properly setup runnig unit and e2e tests on workflows
+- Develop frontend
+
 ## Unit and End to End Tests Status
 [![Run Linting and Infrastructures' Unit Tests](https://github.com/Kuwabuga/website/actions/workflows/test_infrastructure.yml/badge.svg?branch=production)](https://github.com/Kuwabuga/website/actions/workflows/test_infrastructure.yml)<br>
 [![Run Website's Unit and E2E tests](https://github.com/Kuwabuga/website/actions/workflows/test_application.yml/badge.svg?branch=production)](https://github.com/Kuwabuga/website/actions/workflows/test_application.yml)
