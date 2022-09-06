@@ -1,2 +1,2 @@
-import { Testing } from "cdktf";
-Testing.setupJest();
+const cdktf = require("cdktf");
+cdktf.Testing.setupJest();
