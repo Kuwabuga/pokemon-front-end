@@ -140,12 +140,12 @@ jobs:
   invalidate-cache:
     name: Invalidate Cloudfront cache
     needs: [set-environment, deploy-website]
+    if: ${{ needs.set-environment.outputs.ENVIRONMENT }} == "production"
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
       SUBDOMAIN: ${{ needs.set-environment.outputs.SUBDOMAIN }}
       DOMAIN: ${{ needs.set-environment.outputs.DOMAIN }}
-    if: ${{ env.ENVIRONMENT }} == "production" || ${{ env.ENVIRONMENT }} == "prod"
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
