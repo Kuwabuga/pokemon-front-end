@@ -2,8 +2,7 @@
 </script>
 
 <template>
-  <h1>About</h1>
-  <p>Everything about Kuwabuga will be here</p>
+  <h1>Terms and Conditions</h1>
 </template>
 
 <style scoped>
