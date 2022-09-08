@@ -16,9 +16,12 @@ export const buildWebsiteCloudfrontDistribution = (
   domainName: string,
   certificate: DataAwsAcmCertificate,
   bucket: S3Bucket,
-  oai: CloudfrontOriginAccessIdentity
+  oai: CloudfrontOriginAccessIdentity,
+  defaultTtl = 0,
+  maxTtl = 0,
+  minTtl = 0
 ): CloudfrontDistribution => {
-  return new CloudfrontDistribution(scope, `website-${domainName}-cloudfront-distribution`, 
+  return new CloudfrontDistribution(scope, `website-${domainName}-cloudfront-distribution`,
     <CloudfrontDistributionConfig>{
       comment: DEFAULTS.comment,
       tags: DEFAULTS.tags,
@@ -59,9 +62,9 @@ export const buildWebsiteCloudfrontDistribution = (
           }
         },
         viewerProtocolPolicy: "redirect-to-https",
-        minTtl: 0,
-        maxTtl: 31536000,
-        defaultTtl: 2592000
+        defaultTtl: defaultTtl,
+        maxTtl: maxTtl,
+        minTtl: minTtl
       },
       restrictions: <CloudfrontDistributionRestrictions>{
         geoRestriction: <CloudfrontDistributionRestrictionsGeoRestriction>{
@@ -82,7 +85,8 @@ export const buildRedirectCloudfrontDistribution = (
   bucket: S3Bucket,
   bucketWebsiteConfig: S3BucketWebsiteConfiguration
 ): CloudfrontDistribution => {
-  return new CloudfrontDistribution(scope, `redirect-${domainName}-cloudfront-distribution`, 
+  const maximumTtl = 31536000;
+  return new CloudfrontDistribution(scope, `redirect-${domainName}-cloudfront-distribution`,
     <CloudfrontDistributionConfig>{
       comment: DEFAULTS.comment,
       tags: DEFAULTS.tags,
@@ -113,9 +117,9 @@ export const buildRedirectCloudfrontDistribution = (
           }
         },
         viewerProtocolPolicy: "allow-all",
-        minTtl: 0,
-        maxTtl: 31536000,
-        defaultTtl: 2592000
+        defaultTtl: maximumTtl,
+        maxTtl: maximumTtl,
+        minTtl: maximumTtl,
       },
       restrictions: <CloudfrontDistributionRestrictions>{
         geoRestriction: <CloudfrontDistributionRestrictionsGeoRestriction>{

@@ -7,6 +7,30 @@ env:
   APPLICATION_DIRECTORY: "./application"
 
 jobs:
+  audit-and-linting:
+    name: Run audit and linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Install dependencies
+        working-directory: ${{ env.APPLICATION_DIRECTORY }}
+        run: npm install
+
+      # TODO
+      # - name: Run Audit
+      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
+      #   run: npm audit fix
+
+      # - name: Run Lint
+      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
+      #   run: npm run lint
 
   unit-tests:
     name: Run unit tests
@@ -50,12 +74,12 @@ jobs:
       #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
       #   run: npm run test:e2e
 
-  deploy:
-    name: Deploy Website
-    needs: [unit-tests,e2e-tests]
+  set-environment:
+    name: Set environment variables
+    needs: [audit-and-linting,unit-tests,e2e-tests]
     runs-on: ubuntu-latest
     steps:
-      - name: Set environment
+      - name: Set environment based on branch
         run: |
           case ${GITHUB_REF##*/} in
             "production") echo "ENVIRONMENT=production" >> $GITHUB_ENV ;;
@@ -64,6 +88,26 @@ jobs:
             *) echo "ENVIRONMENT=development" >> $GITHUB_ENV ;;
           esac
 
+      - name: Set subdomain and domain
+        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
+        run: |
+          SUBDOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.subdomain")
+          DOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.domain")
+
+    outputs:
+      ENVIRONMENT: ${{ env.ENVIRONMENT }}
+      SUBDOMAIN: ${{ env.SUBDOMAIN }}
+      DOMAIN: ${{ env.DOMAIN }}
+
+  deploy-website:
+    name: Deploy Website
+    needs: [set-environment]
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
+      SUBDOMAIN: ${{ needs.set-environment.outputs.SUBDOMAIN }}
+      DOMAIN: ${{ needs.set-environment.outputs.DOMAIN }}
+    steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
 
@@ -75,15 +119,6 @@ jobs:
       - name: Install application's dependencies
         working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
-
-      # TODO
-      # - name: Run Audit
-      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
-      #   run: npm audit fix
-
-      # - name: Run Lint
-      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
-      #   run: npm run lint
 
       - name: Build
         working-directory: ${{ env.APPLICATION_DIRECTORY }}
@@ -99,18 +134,32 @@ jobs:
       - name: Sync S3 webite bucket
         working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
         env:
-          ENVIRONMENT: ${{ env.ENVIRONMENT }}
           BUILD_PATH: application/dist
-        run: |
-          # Update bucket content
-          SUBDOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.subdomain")
-          DOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.domain")
-          aws s3 sync "../$BUILD_PATH" "s3://$SUBDOMAIN.$DOMAIN" --cache-control "no-cache" --delete
+        run: aws s3 sync "../$BUILD_PATH" "s3://$SUBDOMAIN.$DOMAIN" --cache-control "no-cache" --delete
 
-          # Invalidate Cloudfront cache
+  invalidate-cache:
+    name: Invalidate Cloudfront cache
+    needs: [set-environment, deploy-website]
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
+      SUBDOMAIN: ${{ needs.set-environment.outputs.SUBDOMAIN }}
+      DOMAIN: ${{ needs.set-environment.outputs.DOMAIN }}
+    if: ${{ env.ENVIRONMENT }} == "production" || ${{ env.ENVIRONMENT }} == "prod"
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:  ${{ secrets.AWS_REGION }}
+
+      - name: Invalidate Cloudfront cache
+        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
+        run: |
           DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$SUBDOMAIN.$DOMAIN']] | [0].Id" | sed 's/"//g')
-          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths /*
-          if [ "$ENVIRONMENT" == "production" ] || [ "$ENVIRONMENT" == "prod" ]; then
-            REDIRECT_DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$DOMAIN']] | [0].Id" | sed 's/"//g')
-            aws cloudfront create-invalidation --distribution-id $REDIRECT_DISTRIBUTION --paths /*
-          fi
+          INVALIDATION=$(aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths /* --query Invalidation.Id)
+          aws cloudfront wait invalidation-completed --distribution-id $DISTRIBUTION --id $INVALIDATION

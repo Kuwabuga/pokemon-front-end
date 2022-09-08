@@ -14,18 +14,24 @@ export class WebsiteStack extends TerraformStack {
 
     buildS3Backend(this);
     buildAWSProvider(this, AWS_REGION);
-    
+
     const administrativeRegionProvider = buildAWSProvider(this, AWS_ADMINISTRATIVE_REGION);
     const domainHostedZone = getHostedZone(this, domain);
     const certificate = getHostedZoneCertificate(this, domain, administrativeRegionProvider);
-    
+
     const websiteBucketName = `${subdomain}.${domain}`;
     const websiteBucket = buildS3Bucket(this, websiteBucketName);
     setS3BucketBlockPublicAccess(this, websiteBucketName, websiteBucket, true);
     const websiteOAI = buildCloudfrontOAI(this, websiteBucketName);
     setS3BucketPolicy(this, websiteBucketName, websiteBucket, undefined, { "AWS": websiteOAI.iamArn }, ["s3:GetObject"]);
 
-    const websiteDistribution = buildWebsiteCloudfrontDistribution(this, websiteBucketName, certificate, websiteBucket, websiteOAI);
+    let websiteDistribution;
+    if (IS_PRODUCTION) {
+      websiteDistribution = buildWebsiteCloudfrontDistribution(this, websiteBucketName, certificate, websiteBucket, websiteOAI, 2592000, 31536000, 0);
+    } else {
+      websiteDistribution = buildWebsiteCloudfrontDistribution(this, websiteBucketName, certificate, websiteBucket, websiteOAI);
+    }
+
     const websiteRecord = createHostedZoneRecord(this, websiteBucketName, domainHostedZone, websiteDistribution);
 
     if (IS_PRODUCTION) {
