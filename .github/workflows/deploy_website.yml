@@ -119,10 +119,7 @@ jobs:
           aws-region:  ${{ secrets.AWS_REGION }}
 
       - name: Sync S3 webite bucket
-        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
-        env:
-          BUILD_PATH: application/dist
-        run: aws s3 sync "../$BUILD_PATH" "s3://$SUBDOMAIN.$DOMAIN" --cache-control "no-cache" --delete
+        run: aws s3 sync "application/dist" "s3://$SUBDOMAIN.$DOMAIN" --cache-control "no-cache" --delete
 
   invalidate-cache:
     name: Invalidate Cloudfront cache
@@ -144,7 +141,6 @@ jobs:
           aws-region:  ${{ secrets.AWS_REGION }}
 
       - name: Invalidate Cloudfront cache
-        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
         run: |
           DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$SUBDOMAIN.$DOMAIN']] | [0].Id" | sed 's/"//g')
           INVALIDATION=$(aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths /* --query "Invalidation.Id" | sed 's/"//g')
