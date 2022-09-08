@@ -143,7 +143,7 @@ jobs:
   invalidate-cache:
     name: Invalidate Cloudfront cache
     needs: [set-environment, deploy-website]
-    if: ${{ needs.set-environment.outputs.ENVIRONMENT }} == "production"
+    if: needs.set-environment.outputs.ENVIRONMENT == "production"
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}

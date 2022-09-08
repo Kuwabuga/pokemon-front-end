@@ -2,8 +2,8 @@ name: Run Website's Unit and E2E tests
 
 on:
   pull_request:
-    paths: 
-      - "**"
+    paths:
+      - "application/**"
   push:
     paths:
       - "application/**"
