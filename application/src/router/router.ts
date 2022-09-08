@@ -2,6 +2,7 @@ import { RouteRecordRaw, createRouter, createWebHistory, RouterOptions } from "v
 
 export const routesNames = {
 	HelloWorld: "hello-world",
+	TermsAndConditions: "terms-and-conditions",
 	About: "about",
 	NotFound: "not-found"
 };
@@ -11,6 +12,11 @@ const routes: Array<RouteRecordRaw> = [
   	path: "/",
   	name: routesNames.HelloWorld,
   	component: () => import("@/views/HelloWorld.vue")
+  },
+  <RouteRecordRaw>{
+  	path: "/terms-and-conditions",
+  	name: routesNames.TermsAndConditions,
+  	component: () => import("@/views/TermsAndConditions.vue")
   },
   <RouteRecordRaw>{
   	path: "/about",
