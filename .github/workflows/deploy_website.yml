@@ -161,5 +161,5 @@ jobs:
         working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
         run: |
           DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$SUBDOMAIN.$DOMAIN']] | [0].Id" | sed 's/"//g')
-          INVALIDATION=$(aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths /* --query Invalidation.Id)
+          INVALIDATION=$(aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths /* --query "Invalidation.Id" | sed 's/"//g')
           aws cloudfront wait invalidation-completed --distribution-id $DISTRIBUTION --id $INVALIDATION
