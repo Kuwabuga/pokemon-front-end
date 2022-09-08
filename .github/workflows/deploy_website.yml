@@ -57,7 +57,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
 
-      - name: Set environment based on branch
+      - name: Set environment
         run: |
           case ${GITHUB_REF##*/} in
             "production") echo "ENVIRONMENT=production" >> $GITHUB_ENV ;;
@@ -66,11 +66,16 @@ jobs:
             *) echo "ENVIRONMENT=development" >> $GITHUB_ENV ;;
           esac
 
-      - name: Set subdomain and domain
-        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
+      - name: Set subdomain
         run: |
-          echo "SUBDOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.subdomain")" >> $GITHUB_ENV
-          echo "DOMAIN=$(cat domains.json | jq -r ".$ENVIRONMENT.domain")" >> $GITHUB_ENV
+          if [ "$ENVIRONMENT" == "production" ] then
+            echo "SUBDOMAIN=www" >> $GITHUB_ENV
+          else
+            echo "SUBDOMAIN=$ENVIRONMENT" >> $GITHUB_ENV
+          fi
+
+      - name: Set domain
+        run: echo "DOMAIN=kuwabuga.com" >> $GITHUB_ENV
 
     outputs:
       ENVIRONMENT: ${{ env.ENVIRONMENT }}
