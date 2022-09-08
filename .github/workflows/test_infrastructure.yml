@@ -3,7 +3,7 @@ name: Run Linting and Infrastructures' Unit Tests
 on:
   pull_request:
     paths: 
-      - "**"
+      - "infrastructure/**"
   push:
     paths:
       - "infrastructure/**"
@@ -27,7 +27,7 @@ jobs:
 
       - name: Checkout Repo
         uses: actions/checkout@v2
-      
+
       - name: Install Node
         uses: actions/setup-node@v2
         with:
