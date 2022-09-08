@@ -2,6 +2,7 @@ import { RouteRecordRaw, createRouter, createWebHistory, RouterOptions } from "v
 
 export const routesNames = {
 	HelloWorld: "hello-world",
+	About: "about",
 	NotFound: "not-found"
 };
 
@@ -10,6 +11,11 @@ const routes: Array<RouteRecordRaw> = [
   	path: "/",
   	name: routesNames.HelloWorld,
   	component: () => import("@/views/HelloWorld.vue")
+  },
+  <RouteRecordRaw>{
+  	path: "/about",
+  	name: routesNames.About,
+  	component: () => import("@/views/About.vue")
   },
   <RouteRecordRaw>{
   	path: "/:catchAll(.*)*",

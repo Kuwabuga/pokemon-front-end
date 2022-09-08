@@ -19,9 +19,10 @@
   "rules": {
     "no-mixed-spaces-and-tabs": "off",
     "indent": ["error", "tab"],
-    "linebreak-style": ["error", "unix"],
+    "linebreak-style": "off",
     "quotes": ["error", "double"],
-    "semi": ["error", "always"]
+    "semi": ["error", "always"],
+    "vue/multi-word-component-names": "off"
   },
   "overrides": []
 }
