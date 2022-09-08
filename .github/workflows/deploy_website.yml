@@ -143,7 +143,6 @@ jobs:
   invalidate-cache:
     name: Invalidate Cloudfront cache
     needs: [set-environment, deploy-website]
-    if: needs.set-environment.outputs.ENVIRONMENT == "production"
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
@@ -163,6 +162,8 @@ jobs:
       - name: Invalidate Cloudfront cache
         working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
         run: |
-          DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$SUBDOMAIN.$DOMAIN']] | [0].Id" | sed 's/"//g')
-          INVALIDATION=$(aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths /* --query "Invalidation.Id" | sed 's/"//g')
-          aws cloudfront wait invalidation-completed --distribution-id $DISTRIBUTION --id $INVALIDATION
+          if [ "$ENVIRONMENT" == "production" ]; then
+            DISTRIBUTION=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?Id == '$SUBDOMAIN.$DOMAIN']] | [0].Id" | sed 's/"//g')
+            INVALIDATION=$(aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths /* --query "Invalidation.Id" | sed 's/"//g')
+            aws cloudfront wait invalidation-completed --distribution-id $DISTRIBUTION --id $INVALIDATION
+          fi
