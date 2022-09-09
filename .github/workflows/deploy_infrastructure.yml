@@ -2,14 +2,14 @@ name: Deploy Infrastructure
 
 on: workflow_dispatch
 
-env:
-  INFRASTRUCTURE_DIRECTORY: "./infrastructure"
-
 jobs:
-  deploy:
-    name: Validate & Deploy Terraform
+  set-environment:
+    name: Set environment variables
     runs-on: ubuntu-latest
     steps:
+      - name: Set AWS region
+        run: echo "SERVICE_NAME=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+
       - name: Set environment
         run: |
           case ${GITHUB_REF##*/} in
@@ -19,32 +19,51 @@ jobs:
             *) echo "ENVIRONMENT=development" >> $GITHUB_ENV ;;
           esac
 
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-      
-      - name: Install Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
+      - name: Set service name
+        run: echo "SERVICE_NAME=website" >> $GITHUB_ENV
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:  ${{ secrets.AWS_REGION }}
+      - name: Set subdomain
+        run: |
+          if [ "$ENVIRONMENT" == "production" ] then
+            echo "SUBDOMAIN=www" >> $GITHUB_ENV
+          else
+            echo "SUBDOMAIN=$ENVIRONMENT" >> $GITHUB_ENV
+          fi
 
-      - name: Install Terraform CDK
-        run: npm install --global cdktf-cli@0.12.2
+      - name: Set domain
+        run: echo "DOMAIN=kuwabuga.com" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
-        run: npm install
+      - name: Set redirect
+        run: echo "REDIRECT=$SUBDOMAIN.$DOMAIN" >> $GITHUB_ENV
 
-      - name: Deploy with Terraform CDK
-        working-directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_TERRAFORM_BUCKET: ${{ secrets.AWS_TERRAFORM_BUCKET }}
-          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
-        run: cdktf deploy website-stack --auto-approve
+    outputs:
+      AWS_REGION: ${{ env.AWS_REGION }}
+      ENVIRONMENT: ${{ env.ENVIRONMENT }}
+      SERVICE_NAME: ${{ env.SERVICE_NAME }}
+      SUBDOMAIN: ${{ env.SUBDOMAIN }}
+      DOMAIN: ${{ env.DOMAIN }}
+      REDIRECT: ${{ env.REDIRECT }}
+
+  configure-website:
+    name: Configure AWS S3 website
+    needs: [set-environment]
+    uses: Kuwabuga/configure-aws-s3-website/.github/workflows/deploy_website.yml@production
+    with:
+      AWS_REGION: ${{ needs.set-environment.outputs.AWS_REGION }}
+      ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
+      SERVICE_NAME: ${{ needs.set-environment.outputs.SERVICE_NAME }}
+      SUBDOMAIN: ${{ needs.set-environment.outputs.SUBDOMAIN }}
+      DOMAIN: ${{ needs.set-environment.outputs.DOMAIN }}
+
+  configure-website-redirect:
+    name: Configure AWS S3 website direct
+    needs: [set-environment]
+    if: needs.set-environment.outputs.ENVIRONMENT == 'production'
+    uses: Kuwabuga/configure-aws-s3-website/.github/workflows/deploy_redirect.yml@production
+    with:
+      AWS_REGION: ${{ needs.set-environment.outputs.AWS_REGION }}
+      ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
+      SERVICE_NAME: ${{ needs.set-environment.outputs.SERVICE_NAME }}
+      SUBDOMAIN: ${{ needs.set-environment.outputs.SUBDOMAIN }}
+      DOMAIN: ${{ needs.set-environment.outputs.DOMAIN }}
+      REDIRECT: ${{ needs.set-environment.outputs.REDIRECT }}
