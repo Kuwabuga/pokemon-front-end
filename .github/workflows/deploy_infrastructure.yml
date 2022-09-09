@@ -3,8 +3,8 @@ name: Deploy Infrastructure
 on: workflow_dispatch
 
 jobs:
-  set-environment:
-    name: Set environment variables
+  set-common-environment:
+    name: Set common environment variables
     runs-on: ubuntu-latest
     steps:
       - name: Set environment
@@ -15,57 +15,75 @@ jobs:
             "qa") echo "ENVIRONMENT=qa" >> $GITHUB_ENV ;;
             *) echo "ENVIRONMENT=development" >> $GITHUB_ENV ;;
           esac
-
       - name: Set service name
         run: echo "SERVICE_NAME=website" >> $GITHUB_ENV
-
+      - name: Set domain
+        run: echo "DOMAIN=kuwabuga.com" >> $GITHUB_ENV
+    outputs:
+      ENVIRONMENT: ${{ env.ENVIRONMENT }}
+      SERVICE_NAME: ${{ env.SERVICE_NAME }}
+      DOMAIN: ${{ env.DOMAIN }}
+  
+  set-website-environment:
+    name: Set environment variables to configure website
+    needs: [set-common-environment]
+    runs-on: ubuntu-latest
+    steps:
       - name: Set subdomain
+        env:
+          ENVIRONMENT: ${{ needs.set-common-environment.outputs.ENVIRONMENT }}
         run: |
           if [ "$ENVIRONMENT" == "production" ]; then
             echo "SUBDOMAIN=www" >> $GITHUB_ENV
           else
             echo "SUBDOMAIN=$ENVIRONMENT" >> $GITHUB_ENV
           fi
-
-      - name: Set domain
-        run: echo "DOMAIN=kuwabuga.com" >> $GITHUB_ENV
-
-      - name: Set redirect
-        run: echo "REDIRECT=$SUBDOMAIN.$DOMAIN" >> $GITHUB_ENV
-
     outputs:
-      ENVIRONMENT: ${{ env.ENVIRONMENT }}
-      SERVICE_NAME: ${{ env.SERVICE_NAME }}
       SUBDOMAIN: ${{ env.SUBDOMAIN }}
-      DOMAIN: ${{ env.DOMAIN }}
+  
+  set-redirect-environment:
+    name: Set environment variables to configure website redirect
+    needs: [set-common-environment, set-website-environment]
+    if: needs.set-common-environment.outputs.ENVIRONMENT == 'production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set subdomain
+        run: echo "SUBDOMAIN=" >> $GITHUB_ENV
+      - name: Set redirect
+        env:
+          SUBDOMAIN: ${{ needs.set-website-environment.outputs.SUBDOMAIN }}
+          DOMAIN: ${{ needs.set-common-environment.outputs.DOMAIN }}
+        run: echo "REDIRECT=$SUBDOMAIN.$DOMAIN" >> $GITHUB_ENV
+    outputs:
+      SUBDOMAIN: ${{ env.SUBDOMAIN }}
       REDIRECT: ${{ env.REDIRECT }}
 
   configure-website:
     name: Configure AWS S3 website
-    needs: [set-environment]
+    needs: [set-common-environment, set-website-environment]
     uses: Kuwabuga/configure-aws-s3-website/.github/workflows/deploy_website.yml@production
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
     with:
-      ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
-      SERVICE_NAME: ${{ needs.set-environment.outputs.SERVICE_NAME }}
-      SUBDOMAIN: ${{ needs.set-environment.outputs.SUBDOMAIN }}
-      DOMAIN: ${{ needs.set-environment.outputs.DOMAIN }}
+      ENVIRONMENT: ${{ needs.set-common-environment.outputs.ENVIRONMENT }}
+      SERVICE_NAME: ${{ needs.set-common-environment.outputs.SERVICE_NAME }}
+      SUBDOMAIN: ${{ needs.set-website-environment.outputs.SUBDOMAIN }}
+      DOMAIN: ${{ needs.set-common-environment.outputs.DOMAIN }}
 
   configure-website-redirect:
     name: Configure AWS S3 website direct
-    needs: [set-environment, configure-website]
-    if: needs.set-environment.outputs.ENVIRONMENT == 'production'
+    needs: [set-common-environment, set-redirect-environment, configure-website]
+    if: needs.set-common-environment.outputs.ENVIRONMENT == 'production'
     uses: Kuwabuga/configure-aws-s3-website/.github/workflows/deploy_redirect.yml@production
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
     with:
-      ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
-      SERVICE_NAME: ${{ needs.set-environment.outputs.SERVICE_NAME }}
-      SUBDOMAIN: ${{ needs.set-environment.outputs.SUBDOMAIN }}
-      DOMAIN: ${{ needs.set-environment.outputs.DOMAIN }}
-      REDIRECT: ${{ needs.set-environment.outputs.REDIRECT }}
+      ENVIRONMENT: ${{ needs.set-common-environment.outputs.ENVIRONMENT }}
+      SERVICE_NAME: ${{ needs.set-common-environment.outputs.SERVICE_NAME }}
+      SUBDOMAIN: ${{ needs.set-redirect-environment.outputs.SUBDOMAIN }}
+      DOMAIN: ${{ needs.set-common-environment.outputs.DOMAIN }}
+      REDIRECT: ${{ needs.set-redirect-environment.outputs.REDIRECT }}
