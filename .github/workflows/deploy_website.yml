@@ -60,7 +60,7 @@ jobs:
 
       - name: Set subdomain
         run: |
-          if [ "$ENVIRONMENT" == "production" ] then
+          if [ "$ENVIRONMENT" == "production" ]; then
             echo "SUBDOMAIN=www" >> $GITHUB_ENV
           else
             echo "SUBDOMAIN=$ENVIRONMENT" >> $GITHUB_ENV
