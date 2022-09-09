@@ -7,9 +7,6 @@ jobs:
     name: Set environment variables
     runs-on: ubuntu-latest
     steps:
-      - name: Set AWS region
-        run: echo "AWS_REGION=eu-west-1" >> $GITHUB_ENV
-
       - name: Set environment
         run: |
           case ${GITHUB_REF##*/} in
@@ -37,7 +34,6 @@ jobs:
         run: echo "REDIRECT=$SUBDOMAIN.$DOMAIN" >> $GITHUB_ENV
 
     outputs:
-      AWS_REGION: ${{ env.AWS_REGION }}
       ENVIRONMENT: ${{ env.ENVIRONMENT }}
       SERVICE_NAME: ${{ env.SERVICE_NAME }}
       SUBDOMAIN: ${{ env.SUBDOMAIN }}
@@ -49,7 +45,9 @@ jobs:
     needs: [set-environment]
     uses: Kuwabuga/configure-aws-s3-website/.github/workflows/deploy_website.yml@production
     with:
-      AWS_REGION: ${{ needs.set-environment.outputs.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
       ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
       SERVICE_NAME: ${{ needs.set-environment.outputs.SERVICE_NAME }}
       SUBDOMAIN: ${{ needs.set-environment.outputs.SUBDOMAIN }}
@@ -61,7 +59,9 @@ jobs:
     if: needs.set-environment.outputs.ENVIRONMENT == 'production'
     uses: Kuwabuga/configure-aws-s3-website/.github/workflows/deploy_redirect.yml@production
     with:
-      AWS_REGION: ${{ needs.set-environment.outputs.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
       ENVIRONMENT: ${{ needs.set-environment.outputs.ENVIRONMENT }}
       SERVICE_NAME: ${{ needs.set-environment.outputs.SERVICE_NAME }}
       SUBDOMAIN: ${{ needs.set-environment.outputs.SUBDOMAIN }}
