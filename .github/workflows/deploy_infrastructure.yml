@@ -57,7 +57,7 @@ jobs:
 
   configure-website-redirect:
     name: Configure AWS S3 website direct
-    needs: [set-environment]
+    needs: [set-environment, configure-website]
     if: needs.set-environment.outputs.ENVIRONMENT == 'production'
     uses: Kuwabuga/configure-aws-s3-website/.github/workflows/deploy_redirect.yml@production
     with:
