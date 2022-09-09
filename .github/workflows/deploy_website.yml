@@ -112,7 +112,7 @@ jobs:
           aws-region:  ${{ secrets.AWS_REGION }}
 
       - name: Sync S3 webite bucket
-        run: aws s3 sync "application/dist" "s3://$SUBDOMAIN.$DOMAIN" --cache-control "no-cache" --delete
+        run: aws s3 sync "dist" "s3://$SUBDOMAIN.$DOMAIN" --cache-control "no-cache" --delete
 
   invalidate-cache:
     name: Invalidate Cloudfront cache
