@@ -3,7 +3,6 @@ name: Deploy Application
 on: workflow_dispatch
 
 env:
-  INFRASTRUCTURE_DIRECTORY: "./infrastructure"
   APPLICATION_DIRECTORY: "./application"
 
 jobs:
@@ -20,12 +19,10 @@ jobs:
           node-version: "16"
 
       - name: Install dependencies
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
 
       # TODO
       # - name: Run unit tests
-      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
       #   run: npm run test:unit
 
   e2e-tests:
@@ -41,12 +38,10 @@ jobs:
           node-version: "16"
 
       - name: Install dependencies
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
 
       # TODO
       # - name: Run e2e tests
-      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
       #   run: npm run test:e2e
 
   set-environment:
@@ -100,20 +95,16 @@ jobs:
           node-version: "16"
 
       - name: Install application's dependencies
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
 
       # TODO
       # - name: Run Audit
-      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
       #   run: npm audit fix
 
       # - name: Run Lint
-      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
       #   run: npm run lint
 
       - name: Build
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm run build
 
       - name: Configure AWS credentials
