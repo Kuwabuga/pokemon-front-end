@@ -3,13 +3,10 @@ name: Run Website's Unit and E2E tests
 on:
   pull_request:
     paths:
-      - "application/**"
+      - "**"
   push:
     paths:
-      - "application/**"
-
-env:
-  APPLICATION_DIRECTORY: "./application"
+      - "**"
 
 jobs:
 
@@ -26,12 +23,10 @@ jobs:
           node-version: "16"
 
       - name: Install dependencies
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
 
       # TODO
       # - name: Run unit tests
-      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
       #   run: npm run test:unit
 
   e2e-tests:
@@ -47,10 +42,8 @@ jobs:
           node-version: "16"
 
       - name: Install dependencies
-        working-directory: ${{ env.APPLICATION_DIRECTORY }}
         run: npm install
 
       # TODO
       # - name: Run e2e tests
-      #   working-directory: ${{ env.APPLICATION_DIRECTORY }}
       #   run: npm run test:e2e

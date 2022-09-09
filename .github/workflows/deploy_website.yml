@@ -2,9 +2,6 @@ name: Deploy Application
 
 on: workflow_dispatch
 
-env:
-  APPLICATION_DIRECTORY: "./application"
-
 jobs:
   unit-tests:
     name: Run unit tests
