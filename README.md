@@ -13,7 +13,6 @@ www.kuwabuga.com
 - Develop frontend
 
 ## Unit and End to End Tests Status
-[![Run Linting and Infrastructures' Unit Tests](https://github.com/Kuwabuga/website/actions/workflows/test_infrastructure.yml/badge.svg?branch=production)](https://github.com/Kuwabuga/website/actions/workflows/test_infrastructure.yml)<br>
 [![Run Website's Unit and E2E tests](https://github.com/Kuwabuga/website/actions/workflows/test_application.yml/badge.svg?branch=production)](https://github.com/Kuwabuga/website/actions/workflows/test_application.yml)
 
 ## Deployments Status
