@@ -61,7 +61,7 @@ jobs:
   configure-website:
     name: Configure AWS S3 website
     needs: [set-common-environment, set-website-environment]
-    uses: Kuwabuga/configure-aws-s3-website/.github/workflows/deploy_website.yml@production
+    uses: migas99/configure-aws-s3-website/deploy_website.yml@production
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -77,7 +77,7 @@ jobs:
     name: Configure AWS S3 website direct
     needs: [set-common-environment, set-redirect-environment, configure-website]
     if: needs.set-common-environment.outputs.ENVIRONMENT == 'production'
-    uses: Kuwabuga/configure-aws-s3-website/.github/workflows/deploy_redirect.yml@production
+    uses: migas99/configure-aws-s3-website/deploy_redirect.yml@production
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
